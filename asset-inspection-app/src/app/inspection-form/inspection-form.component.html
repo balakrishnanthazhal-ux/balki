@@ -1,0 +1,365 @@
+<div class="app-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="sidebar-brand">
+      <span class="material-icons brand-icon">engineering</span>
+      <span class="brand-text">
+        ASSET<span class="accent">INSPECT</span>
+      </span>
+    </div>
+
+    <div class="user-card">
+      <div class="user-avatar">
+        {{ currentUser?.name?.charAt(0) }}
+      </div>
+      <div class="user-info">
+        <p class="user-name">{{ currentUser?.name }}</p>
+        <p class="user-role">{{ currentUser?.role }}</p>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-item active">
+        <span class="material-icons">assignment</span>
+        <span>New Inspection</span>
+      </a>
+      <a class="nav-item" (click)="goToHistory()" style="cursor:pointer;">
+        <span class="material-icons">history</span>
+        <span>History</span>
+      </a>
+    </nav>
+
+    <button class="logout-btn" (click)="logout()">
+      <span class="material-icons">logout</span>
+      Logout
+    </button>
+
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <header class="page-header">
+      <div>
+        <h2 class="page-title">
+          <span class="material-icons">add_circle</span>
+          New Inspection Form
+        </h2>
+        <p class="page-sub">Asset field inspection record</p>
+      </div>
+      <div class="header-time">
+        <span class="material-icons">schedule</span>
+        {{ form.date }} &nbsp; {{ form.time }}
+      </div>
+    </header>
+
+    <!-- SUCCESS TOAST -->
+    <div class="success-toast" *ngIf="submitSuccess">
+      <span class="material-icons">check_circle</span>
+      Form submitted successfully! DB-ல save ஆச்சு ✅
+    </div>
+
+    <!-- SUBMITTING TOAST -->
+    <div class="success-toast" *ngIf="isSubmitting" style="background: #0077cc;">
+      <span class="material-icons">hourglass_empty</span>
+      Saving to database...
+    </div>
+
+    <!-- FORM -->
+    <form (ngSubmit)="onSubmit()" class="inspection-form fade-in">
+
+      <!-- ROW 1: Date & Time -->
+      <div class="form-section">
+        <div class="section-title">
+          <span class="material-icons">event</span>
+          Date & Time
+        </div>
+        <div class="form-grid two-col">
+          <div class="field-group">
+            <label class="field-label">
+              <span class="material-icons">calendar_today</span> DATE
+            </label>
+            <input type="date" class="field-input" [(ngModel)]="form.date" name="date" required />
+          </div>
+          <div class="field-group">
+            <label class="field-label">
+              <span class="material-icons">access_time</span> TIME
+            </label>
+            <div class="time-wrap">
+              <input type="time" class="field-input" [(ngModel)]="form.time" name="time" required />
+              <button type="button" class="refresh-time-btn" (click)="setCurrentTime()" title="Set current time">
+                <span class="material-icons">my_location</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 2: Project & Asset -->
+      <div class="form-section">
+        <div class="section-title">
+          <span class="material-icons">business</span>
+          Project Details
+        </div>
+        <div class="form-grid two-col">
+
+          <div class="field-group">
+            <label class="field-label">
+              <span class="material-icons">folder</span>
+              PROJECT NAME <span class="req">*</span>
+            </label>
+            <input
+              type="text"
+              class="field-input"
+              [class.error]="submitted && !form.projectName"
+              [(ngModel)]="form.projectName"
+              name="projectName"
+              placeholder="Enter project name"
+            />
+            <span class="err-text" *ngIf="submitted && !form.projectName">
+              Project Name is required
+            </span>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">
+              <span class="material-icons">person</span>
+              PERSON NAME <span class="req">*</span>
+            </label>
+            <input
+              type="text"
+              class="field-input"
+              [class.error]="submitted && !form.personName"
+              [(ngModel)]="form.personName"
+              name="personName"
+              placeholder="Enter person name"
+            />
+            <span class="err-text" *ngIf="submitted && !form.personName">
+              Person Name is required
+            </span>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">
+              <span class="material-icons">inventory_2</span>
+              ASSET NAME <span class="req">*</span>
+            </label>
+            <input
+              type="text"
+              class="field-input"
+              [class.error]="submitted && !form.assetName"
+              [(ngModel)]="form.assetName"
+              name="assetName"
+              placeholder="Enter asset name"
+            />
+            <span class="err-text" *ngIf="submitted && !form.assetName">
+              Asset Name is required
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ROW 3: Remark -->
+      <div class="form-section">
+        <div class="section-title">
+          <span class="material-icons">comment</span>
+          Remarks
+        </div>
+        <div class="field-group">
+          <label class="field-label">
+            <span class="material-icons">notes</span> REMARK
+          </label>
+          <textarea
+            class="field-input textarea"
+            [(ngModel)]="form.remark"
+            name="remark"
+            rows="4"
+            placeholder="Enter inspection remarks..."
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- ROW 4: Progress -->
+      <div class="form-section">
+        <div class="section-title">
+          <span class="material-icons">trending_up</span>
+          Progress
+        </div>
+        <div class="field-group">
+          <label class="field-label">
+            <span class="material-icons">percent</span> PROGRESS % &nbsp;
+            <span class="progress-badge" [style.background]="progressColor">{{ form.progress }}%</span>
+            <span class="progress-label-text">{{ progressLabel }}</span>
+          </label>
+          <div class="slider-wrap">
+            <input
+              type="range"
+              class="progress-slider"
+              [(ngModel)]="form.progress"
+              name="progress"
+              min="0" max="100" step="5"
+              [style.--thumb-color]="progressColor"
+            />
+            <div class="slider-track">
+              <div class="slider-fill" [style.width]="form.progress + '%'" [style.background]="progressColor"></div>
+            </div>
+          </div>
+          <div class="progress-marks">
+            <span *ngFor="let m of [0,25,50,75,100]">{{ m }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 5: PLACE -->
+      <div class="form-section place-section">
+        <div class="section-title">
+          <span class="material-icons">place</span>
+          Place (GPS + Photo)
+        </div>
+
+        <div *ngIf="!form.place" class="place-capture-area">
+          <div class="place-info-text">
+            <span class="material-icons">info</span>
+            Click "Place Capture" to capture GPS location along with a photo
+          </div>
+          <button type="button" class="place-btn" (click)="capturePlace()">
+            <span class="material-icons">add_location_alt</span>
+            PLACE CAPTURE
+          </button>
+        </div>
+
+        <div *ngIf="form.place" class="place-captured">
+          <div class="place-photo-wrap">
+            <img *ngIf="form.place.photo" [src]="form.place.photo" class="captured-photo" alt="Inspection photo" />
+            <div *ngIf="!form.place.photo" class="no-photo">
+              <span class="material-icons">photo_camera_off</span>
+              No photo taken
+            </div>
+            <div class="photo-actions">
+              <button type="button" class="photo-action-btn download" (click)="downloadPhoto()" *ngIf="form.place.photo">
+                <span class="material-icons">download</span>
+              </button>
+              <button type="button" class="photo-action-btn map" (click)="openMapLink()">
+                <span class="material-icons">map</span>
+              </button>
+              <button type="button" class="photo-action-btn clear" (click)="clearPlace()">
+                <span class="material-icons">delete</span>
+              </button>
+            </div>
+          </div>
+          <div class="gps-info">
+            <div class="gps-row">
+              <span class="material-icons gps-icon">my_location</span>
+              <div>
+                <p class="gps-coords">
+                  {{ form.place.latitude.toFixed(6) }}, {{ form.place.longitude.toFixed(6) }}
+                </p>
+                <p class="gps-accuracy">Accuracy: ±{{ form.place.accuracy }}m</p>
+              </div>
+            </div>
+            <div class="gps-address">
+              <span class="material-icons">location_on</span>
+              <p>{{ form.place.address }}</p>
+            </div>
+            <button type="button" class="recapture-btn" (click)="capturePlace()">
+              <span class="material-icons">refresh</span> Recapture
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUBMIT -->
+      <div class="form-actions">
+        <button type="button" class="reset-btn" (click)="resetForm()">
+          <span class="material-icons">refresh</span> Reset
+        </button>
+        <button type="submit" class="submit-btn" [disabled]="isSubmitting">
+          <span class="material-icons">{{ isSubmitting ? 'hourglass_empty' : 'send' }}</span>
+          {{ isSubmitting ? 'SAVING...' : 'SUBMIT INSPECTION' }}
+        </button>
+      </div>
+
+    </form>
+  </main>
+</div>
+
+<!-- PLACE MODAL -->
+<div class="modal-overlay" *ngIf="showPlaceModal" (click)="closePlaceModal()">
+  <div class="place-modal" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h3><span class="material-icons">add_location_alt</span> Place Capture</h3>
+      <button class="modal-close" (click)="closePlaceModal()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="modal-loading" *ngIf="placeLoading">
+      <div class="gps-spinner">
+        <span class="material-icons spin">my_location</span>
+      </div>
+      <p>Detecting GPS Location...</p>
+    </div>
+
+    <div class="modal-error" *ngIf="placeError">
+      <span class="material-icons">error</span>
+      <p>{{ placeError }}</p>
+      <button class="retry-btn" (click)="capturePlace()">Try Again</button>
+    </div>
+
+    <div *ngIf="!placeLoading && !placeError && locationData">
+
+      <div class="modal-gps-info">
+        <span class="material-icons">gps_fixed</span>
+        <div>
+          <strong>{{ locationData.lat.toFixed(6) }}, {{ locationData.lng.toFixed(6) }}</strong>
+          <p class="acc-text">Accuracy: ±{{ locationData.accuracy }}m &nbsp;|&nbsp; {{ addressResolved | slice:0:60 }}...</p>
+        </div>
+      </div>
+
+      <div class="camera-section" *ngIf="showCamera && !capturedPhoto">
+        <div class="camera-frame">
+          <video id="liveCamera" autoplay playsinline muted class="camera-video"></video>
+          <div class="camera-overlay-scan"></div>
+          <div class="camera-corners">
+            <span class="corner tl"></span>
+            <span class="corner tr"></span>
+            <span class="corner bl"></span>
+            <span class="corner br"></span>
+          </div>
+          <div class="gps-watermark">
+            📍 {{ locationData.lat.toFixed(5) }}, {{ locationData.lng.toFixed(5) }}
+          </div>
+        </div>
+        <div class="camera-error" *ngIf="cameraError">{{ cameraError }}</div>
+        <div class="camera-controls">
+          <button class="capture-btn" (click)="takePicture()">
+            <span class="capture-inner"></span>
+          </button>
+          <p class="cam-hint">Press the camera button to take a photo</p>
+        </div>
+      </div>
+
+      <div class="photo-preview-section" *ngIf="capturedPhoto">
+        <img [src]="capturedPhoto" class="preview-img" alt="Captured" />
+        <div class="preview-actions">
+          <button class="prev-action-btn retake" (click)="retakePhoto()">
+            <span class="material-icons">camera_alt</span> Retake
+          </button>
+          <button class="prev-action-btn confirm" (click)="confirmPlace()">
+            <span class="material-icons">check_circle</span> Confirm
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="!showCamera && !capturedPhoto" class="skip-photo">
+        <button class="skip-btn" (click)="confirmPlace()">
+          <span class="material-icons">location_on</span>
+          Save Location Only (Without Photo)
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

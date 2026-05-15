@@ -1,0 +1,145 @@
+<div class="app-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="material-icons brand-icon">engineering</span>
+      <span class="brand-text">ASSET<span class="accent">INSPECT</span></span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" (click)="goToForm()">
+        <span class="material-icons">assignment</span>
+        <span>New Inspection</span>
+      </a>
+      <a class="nav-item active">
+        <span class="material-icons">history</span>
+        <span>History</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+    <header class="page-header">
+      <h2 class="page-title">
+        <span class="material-icons">history</span>
+        Inspection History
+      </h2>
+      <p class="page-sub">All submitted inspection records</p>
+    </header>
+
+    <div class="search-bar" style="margin-bottom:20px;">
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        (input)="search()"
+        placeholder="Search by project / person / asset..."
+      />
+    </div>
+
+    <div *ngIf="loading" style="text-align:center; padding:60px; color:#8899aa;">
+      <span class="material-icons" style="font-size:48px; animation:spin 1s linear infinite; color:#00bcd4;">autorenew</span>
+      <p style="margin-top:12px;">Loading records...</p>
+    </div>
+
+    <div *ngIf="!loading" style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Project</th>
+            <th>Person</th>
+            <th>Asset</th>
+            <th>Progress</th>
+            <th>Remark</th>
+            <th>Photo</th>
+            <th style="text-align:center;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filtered; let i = index"
+              [style.background]="i % 2 === 0 ? '#0d1b2a' : '#111f30'">
+            <td>{{ item.id }}</td>
+            <td>{{ item.inspection_date }}</td>
+            <td>{{ item.project_name }}</td>
+            <td>{{ item.person_name }}</td>
+            <td>{{ item.asset_name }}</td>
+            <td>
+              <!-- ✅ FIX: use progress not progress_percent -->
+              <div class="progress-bar-wrap">
+                <div class="progress-bar-fill"
+                     [style.width]="item.progress + '%'"
+                     [style.background]="item.progress >= 75 ? '#28a745' : item.progress >= 40 ? '#ffc107' : '#dc3545'">
+                </div>
+              </div>
+              <small style="color:#8899aa;">{{ item.progress }}%</small>
+            </td>
+            <td>{{ item.remark || '-' }}</td>
+            <!-- ✅ NEW: Photo column -->
+            <td style="text-align:center;">
+              <img *ngIf="item.photo_base64"
+                   [src]="item.photo_base64"
+                   style="width:50px; height:50px; object-fit:cover; border-radius:6px; cursor:pointer; border:1px solid #1e3a5f;"
+                   (click)="viewPhoto(item.photo_base64)"
+                   title="Click to view full photo"/>
+              <span *ngIf="!item.photo_base64" style="color:#8899aa; font-size:0.75rem;">No photo</span>
+            </td>
+            <td style="text-align:center; white-space:nowrap;">
+              <button class="btn-edit" (click)="openEdit(item)">
+                <span class="material-icons" style="font-size:15px; vertical-align:middle;">edit</span>
+              </button>
+              <button class="btn-delete" (click)="deleteItem(item.id)">
+                <span class="material-icons" style="font-size:15px; vertical-align:middle;">delete</span>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="filtered.length === 0">
+            <td colspan="9" style="text-align:center; padding:40px; color:#8899aa;">No records found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" *ngIf="editMode">
+  <div class="modal-box">
+    <h3><span class="material-icons" style="vertical-align:middle; margin-right:8px;">edit</span>Edit Inspection</h3>
+    <div class="modal-field">
+      <label>PROJECT NAME</label>
+      <input [(ngModel)]="editData.project_name" />
+    </div>
+    <div class="modal-field">
+      <label>PERSON NAME</label>
+      <input [(ngModel)]="editData.person_name" />
+    </div>
+    <div class="modal-field">
+      <label>ASSET NAME</label>
+      <input [(ngModel)]="editData.asset_name" />
+    </div>
+    <div class="modal-field">
+      <label>PROGRESS %</label>
+      <!-- ✅ FIX: use progress not progress_percent -->
+      <input type="number" min="0" max="100" [(ngModel)]="editData.progress" />
+    </div>
+    <div class="modal-field">
+      <label>REMARK</label>
+      <textarea [(ngModel)]="editData.remark" rows="3"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeEdit()">Cancel</button>
+      <button class="btn-save" (click)="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- PHOTO FULLSCREEN MODAL -->
+<div class="modal-overlay" *ngIf="photoUrl" (click)="photoUrl=''">
+  <div style="max-width:90vw; max-height:90vh; position:relative;">
+    <img [src]="photoUrl" style="max-width:90vw; max-height:85vh; border-radius:10px; display:block;"/>
+    <button (click)="photoUrl=''"
+      style="position:absolute; top:-16px; right:-16px; background:#ff4444; border:none; border-radius:50%; width:32px; height:32px; color:white; font-size:1.1rem; cursor:pointer;">✕</button>
+  </div>
+</div>

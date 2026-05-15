@@ -1,0 +1,173 @@
+<div class="login-bg">
+  <!-- Animated grid background -->
+  <div class="grid-overlay"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="login-card fade-in">
+    <!-- Logo / Header -->
+    <div class="login-header">
+      <div class="logo-ring">
+        <div class="logo-inner">
+          <span class="material-icons logo-icon">engineering</span>
+        </div>
+        <div class="ring-pulse"></div>
+      </div>
+      <h1 class="app-title">ASSET<span class="accent">INSPECT</span></h1>
+      <p class="app-subtitle">Field Inspection Management System</p>
+    </div>
+
+    <!-- TAB SWITCHER -->
+    <div class="tab-switcher">
+      <button class="tab-btn" [class.active]="activeTab === 'login'"
+        (click)="activeTab = 'login'; error = ''; clearFields()" type="button">
+        Login
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'signup'"
+        (click)="activeTab = 'signup'; error = ''; clearFields()" type="button">
+        Sign Up
+      </button>
+      <div class="tab-indicator" [class.right]="activeTab === 'signup'"></div>
+    </div>
+
+    <!-- ===== LOGIN FORM ===== -->
+    <form *ngIf="activeTab === 'login'" (ngSubmit)="onLogin()" class="login-form">
+
+      <div class="field-group">
+        <label class="field-label">
+          <span class="material-icons">person</span> USERNAME
+        </label>
+        <input type="text" class="field-input" [(ngModel)]="username"
+          name="username" placeholder="Enter your username" autocomplete="username" />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">
+          <span class="material-icons">lock</span> PASSWORD
+        </label>
+        <div class="password-wrap">
+          <input [type]="showPassword ? 'text' : 'password'" class="field-input"
+            [(ngModel)]="password" name="password" placeholder="Enter your password"
+            autocomplete="current-password" />
+          <button type="button" class="toggle-pw" (click)="showPassword = !showPassword">
+            <span class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="error-msg" *ngIf="error">
+        <span class="material-icons">error_outline</span>
+        {{ error }}
+      </div>
+
+      <button type="submit" class="login-btn" [class.loading]="loading" [disabled]="loading">
+        <span *ngIf="!loading"><span class="material-icons">login</span> LOGIN</span>
+        <span *ngIf="loading" class="btn-loader">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </span>
+      </button>
+
+      <p class="switch-text">
+        Don't have an account?
+        <a (click)="activeTab = 'signup'; error = ''; clearFields()">Sign Up</a>
+      </p>
+    </form>
+
+    <!-- ===== SIGN UP FORM ===== -->
+    <form *ngIf="activeTab === 'signup'" (ngSubmit)="onSignUp()" class="login-form">
+
+      <!-- Username -->
+      <div class="field-group">
+        <label class="field-label">
+          <span class="material-icons">person</span> USERNAME
+        </label>
+        <input type="text" class="field-input"
+          [class.field-error]="signupSubmitted && !username"
+          [(ngModel)]="username" name="su_username"
+          placeholder="Choose a username" autocomplete="off" />
+        <span class="err-text" *ngIf="signupSubmitted && !username">Username is required</span>
+      </div>
+
+      <!-- Password -->
+      <div class="field-group">
+        <label class="field-label">
+          <span class="material-icons">lock</span> PASSWORD
+        </label>
+        <div class="password-wrap">
+          <input [type]="showPassword ? 'text' : 'password'" class="field-input"
+            [class.field-error]="signupSubmitted && !password"
+            [(ngModel)]="password" name="su_password"
+            placeholder="Create a password" autocomplete="new-password" />
+          <button type="button" class="toggle-pw" (click)="showPassword = !showPassword">
+            <span class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+          </button>
+        </div>
+        <span class="err-text" *ngIf="signupSubmitted && !password">Password is required</span>
+        <!-- Strength bar -->
+        <div class="strength-bar" *ngIf="password">
+          <div class="strength-fill"
+            [style.width]="passwordStrength.percent + '%'"
+            [style.background]="passwordStrength.color">
+          </div>
+        </div>
+        <span class="strength-label" *ngIf="password" [style.color]="passwordStrength.color">
+          {{ passwordStrength.label }}
+        </span>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="field-group">
+        <label class="field-label">
+          <span class="material-icons">lock_reset</span> CONFIRM PASSWORD
+        </label>
+        <div class="password-wrap">
+          <input [type]="showConfirmPassword ? 'text' : 'password'" class="field-input"
+            [class.field-error]="signupSubmitted && (!confirmPassword || confirmPassword !== password)"
+            [(ngModel)]="confirmPassword" name="su_confirm"
+            placeholder="Re-enter your password" autocomplete="new-password" />
+          <button type="button" class="toggle-pw" (click)="showConfirmPassword = !showConfirmPassword">
+            <span class="material-icons">{{ showConfirmPassword ? 'visibility_off' : 'visibility' }}</span>
+          </button>
+        </div>
+        <!-- Match indicator -->
+        <div class="match-indicator" *ngIf="confirmPassword">
+          <span class="material-icons match-icon"
+            [class.match]="confirmPassword === password"
+            [class.no-match]="confirmPassword !== password">
+            {{ confirmPassword === password ? 'check_circle' : 'cancel' }}
+          </span>
+          <span [class.match]="confirmPassword === password"
+                [class.no-match]="confirmPassword !== password">
+            {{ confirmPassword === password ? 'Passwords match' : 'Passwords do not match' }}
+          </span>
+        </div>
+        <span class="err-text" *ngIf="signupSubmitted && !confirmPassword">Confirm Password is required</span>
+        <span class="err-text" *ngIf="signupSubmitted && confirmPassword && confirmPassword !== password">
+          Passwords do not match
+        </span>
+      </div>
+
+      <div class="error-msg" *ngIf="error">
+        <span class="material-icons">error_outline</span> {{ error }}
+      </div>
+
+      <div class="success-msg" *ngIf="signupSuccess">
+        <span class="material-icons">check_circle</span>
+        Account created successfully! Please login.
+      </div>
+
+      <button type="submit" class="login-btn" [class.loading]="loading" [disabled]="loading">
+        <span *ngIf="!loading"><span class="material-icons">person_add</span> CREATE ACCOUNT</span>
+        <span *ngIf="loading" class="btn-loader">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </span>
+      </button>
+
+      <p class="switch-text">
+        Already have an account?
+        <a (click)="activeTab = 'login'; error = ''; clearFields()">Login</a>
+      </p>
+    </form>
+
+  </div>
+</div>

@@ -1,0 +1,254 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.app-layout {
+  display: flex;
+  height: 100vh;
+  background: #0d1b2a;
+  color: #e0e0e0;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px;
+  background: #0a1628;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+  border-right: 1px solid #1e3a5f;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px 24px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.brand-icon { color: #00bcd4; }
+.accent { color: #00bcd4; }
+
+.sidebar-nav {
+  flex: 1;
+  padding: 10px 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  color: #8899aa;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  background: #1e3a5f;
+  color: #00bcd4;
+}
+
+.nav-item.active {
+  background: #1e3a5f;
+  color: #00bcd4;
+  border-left: 3px solid #00bcd4;
+}
+
+/* MAIN */
+.main-content {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  color: #00bcd4;
+}
+
+.page-sub {
+  color: #8899aa;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* SEARCH */
+.search-bar input {
+  background: #1e3a5f;
+  color: #fff;
+  border: 1px solid #2a4a6f;
+  border-radius: 8px;
+  padding: 10px 16px;
+  width: 100%;
+  max-width: 400px;
+  font-size: 14px;
+}
+
+.search-bar input::placeholder { color: #8899aa; }
+.search-bar input:focus { outline: none; border-color: #00bcd4; }
+
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+thead tr {
+  background: #1e3a5f;
+}
+
+thead th {
+  padding: 12px 10px;
+  text-align: left;
+  color: #00bcd4;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+tbody tr {
+  border-bottom: 1px solid #1e3a5f;
+  transition: background 0.2s;
+}
+
+tbody tr:hover { background: #1a2d45 !important; }
+
+tbody td {
+  padding: 12px 10px;
+  color: #ccd6e0;
+}
+
+.progress-bar-wrap {
+  background: #0d1b2a;
+  border-radius: 10px;
+  height: 8px;
+  width: 90px;
+}
+
+.progress-bar-fill {
+  height: 8px;
+  border-radius: 10px;
+}
+
+/* ACTION BUTTONS */
+.btn-edit {
+  background: #0077cc;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 6px;
+}
+
+.btn-delete {
+  background: #cc2200;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-box {
+  background: #0a1628;
+  border: 1px solid #1e3a5f;
+  border-radius: 12px;
+  padding: 30px;
+  width: 90%;
+  max-width: 500px;
+}
+
+.modal-box h3 {
+  color: #00bcd4;
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+.modal-field {
+  margin-bottom: 14px;
+}
+
+.modal-field label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #8899aa;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.modal-field input,
+.modal-field textarea {
+  width: 100%;
+  padding: 9px 12px;
+  background: #1e3a5f;
+  border: 1px solid #2a4a6f;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 14px;
+}
+
+.modal-field input:focus,
+.modal-field textarea:focus {
+  outline: none;
+  border-color: #00bcd4;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.btn-cancel {
+  padding: 8px 20px;
+  border: 1px solid #2a4a6f;
+  background: transparent;
+  color: #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-save {
+  padding: 8px 20px;
+  background: #00bcd4;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
